@@ -45,11 +45,8 @@ class Analyst:
 
         self.word2vec: Word2VecModel = word2vec_model
 
-        self.candidates: List[Optional[str]] = []
-        self.morph_sets: List[Optional[Tuple[Set[Optional[str]], Set[Optional[str]]]]] = []
-
     def parse(self, sentence: str)\
-            -> None:
+            -> Tuple[List[str], List[Optional[Tuple[Set[Optional[str]], Set[Optional[str]]]]]]:
         sentence: str = sentence.replace(' ', '').replace('　', '').replace('\n', '').replace('\t', '')
 
         candidates: List[str] = [elem for elem in re.split(r'。', sentence) if elem != '']
@@ -77,13 +74,17 @@ class Analyst:
 
             morph_sets.append((child_morphs, parent_morphs))
 
-        self.candidates = candidates
-        self.morph_sets = morph_sets
+        return (candidates, morph_sets)
 
-    def calc_query_base_score(self, query_words: List[str]) -> List[float]:
+    def calc_query_base_score(
+            self,
+            candidates: List[str],
+            morph_sets: Tuple[List, List],
+            query_words: List[str]
+    ) -> List[float]:
         query_base_scores: List[Optional[float]] = []
 
-        for candidate, morph_set in zip(self.candidates, self.morph_sets):
+        for candidate, morph_set in zip(candidates, morph_sets):
             score: float = 0.0
             length: int = 0
 
@@ -103,10 +104,10 @@ class Analyst:
 
         return query_base_scores
 
-    def calc_candidate_score(self) -> List[float]:
+    def calc_candidate_score(self, candidates: List[str], morph_sets: Tuple[List, List]) -> List[float]:
         candidate_scores: List[Optional[float]] = []
 
-        for candidate, morph_set in zip(self.candidates, self.morph_sets):
+        for candidate, morph_set in zip(candidates, morph_sets):
             score: float = 0.0
             length: int = 0
 
