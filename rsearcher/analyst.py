@@ -50,7 +50,7 @@ class Analyst:
         sentence: str = sentence.replace(' ', '').replace('　', '').replace('\n', '').replace('\t', '')
 
         candidates: List[str] = [elem for elem in re.split(r'。', sentence) if elem != '']
-        morph_sets: List[Optional[Tuple[Set[Optional[str]], Set[Optional[str]]]]] = []
+        morph_sets: List[Optional[Tuple[List[str], List[str]]]] = []
 
         for i, candidate in enumerate(candidates):
             try:
@@ -72,7 +72,7 @@ class Analyst:
             child_morphs -= child_morphs & parent_morphs
             parent_morphs -= child_morphs & parent_morphs
 
-            morph_sets.append((child_morphs, parent_morphs))
+            morph_sets.append((list(child_morphs), list(parent_morphs)))
 
         return (candidates, morph_sets)
 
